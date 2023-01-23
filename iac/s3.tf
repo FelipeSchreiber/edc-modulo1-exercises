@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "datalake" {
-    bucket = "${var.base_bucket_name}-${var.ambiente}-${var.numero_conta}"
+    bucket = "${var.base_bucket_name}-${var.environment}-${var.account_number}"
     acl = "private"
     server_side_encryption_configuration {
       rule {
@@ -9,6 +9,6 @@ resource "aws_s3_bucket" "datalake" {
       }
     }
   tags = {
-    CURSO = "EDC"
+    "CURSO" = "EDC"
   }
 }
