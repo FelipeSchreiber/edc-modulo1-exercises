@@ -10,7 +10,3 @@ variable "account_number" {
   default = "689150947157"
 }
 
-variable "aws_region" {
-  default = "us-east-2"
-}
-
