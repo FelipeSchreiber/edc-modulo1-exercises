@@ -1,29 +1,35 @@
+import pyspark
+from pyspark.sql.functions import col, count
 from pyspark.sql import SparkSession
+
+
+pathSource = "s3://datalake-felipeschreiber-689150947157/raw-data/"
+pathDestination = "s3://datalake-felipeschreiber-689150947157/consumer-zone/"
 
 # Create SparkSession
 spark = (
           SparkSession.builder
-                      .master("local[*]")
-                      .appName('tarn-csv-parquet')
-                      .config("spark.sql.shuffle.partitions", 8)  
+                      .appName('tarn-csv-to-parquet')
                       .getOrCreate()
          )
 
 
+# DataframeRead 
 df_enem = (spark.read
                 .format("csv")
                 .option("header", "true")
                 .option("sep", ";")
+                .option("encoding", "ISO-8859-1")
                 .option("inferSchema", "true")
-                .load("s3://datalake-felipeschreiber-689150947157/raw-data/microdados_enem_2020.csv"))
+                .load(pathSource)
+                .withColumn("year", col("NU_ANO")))
 
 
+# DataframeWrite 
 (
   df_enem.write
          .format("parquet")
-         .option("compression","snappy")
          .mode("overwrite")
-         .option("mergeSchema", "true")
-         .partitionBy("NU_ANO")
-         .save('s3://datalake-felipeschreiber-689150947157/consumer-zone/microdados_enem_2020.parquet')
+         .partitionBy("year")
+         .save(pathDestination)
 )
